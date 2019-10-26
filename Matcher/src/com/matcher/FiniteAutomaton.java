@@ -3,15 +3,10 @@ package com.matcher;
 import java.util.Scanner;
 
 public class FiniteAutomaton implements Matcher {
-  private String pattern;
   private int[][] transition;
   
-  public FiniteAutomaton(String pattern) {
-    this.pattern = pattern;
-  }
-  
   @Override
-  public int findMatch(String text) {
+  public int findMatch(String text, String pattern) {
     int index = -1;
     Scanner scanner = new Scanner(System.in);
     System.out.print("Enter the alphabet: ");
@@ -34,9 +29,7 @@ public class FiniteAutomaton implements Matcher {
     for (int q = 0; q < m + 1; q++) {
       for (int i = 0; i < alphabet.length; i++) {
         int k = Math.min(m, q + 1);
-        while (k > 0
-            && !(pattern.substring(0, Math.min(q + 1, m)))
-            .startsWith(pattern.substring(q - k + 1, q) + alphabet[i])) {
+        while (k > 0 && !(pattern.substring(0, Math.min(q + 1, m))).startsWith(pattern.substring(q - k + 1, q) + alphabet[i])) {
           k--;
         }
         transition[q][i] = k;
@@ -54,6 +47,7 @@ public class FiniteAutomaton implements Matcher {
     }
     return i;
   }
+  
   
   
   private void printTransitionTable(char[] sigma) {

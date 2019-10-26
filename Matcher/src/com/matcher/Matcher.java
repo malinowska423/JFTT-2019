@@ -1,5 +1,5 @@
 package com.matcher;
 
 public interface Matcher {
-  int findMatch(String text);
+  int findMatch(String text, String pattern);
 }
