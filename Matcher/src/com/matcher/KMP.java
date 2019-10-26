@@ -26,9 +26,9 @@ public class KMP implements Matcher {
     int m = pattern.length();
     prefix = new int[m];
     prefix[0] = 0;
-    int k = 0;
+    int k = -1;
     for (int q = 1; q < m; q++) {
-      while (k > 0 && pattern.charAt(k + 1) != pattern.charAt(q)) {
+      while (k > -1 && pattern.charAt(k + 1) != pattern.charAt(q)) {
         k = prefix[k];
       }
       if (pattern.charAt(k + 1) == pattern.charAt(q)) k++;
