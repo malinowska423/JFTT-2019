@@ -31,6 +31,7 @@ public class Main {
                 System.out.println("Enter the line of text to search: ");
                 input = scanner.nextLine();
             }
+            scanner.close();
         }
     }
 }
