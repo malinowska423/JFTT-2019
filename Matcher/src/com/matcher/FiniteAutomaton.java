@@ -1,44 +1,47 @@
 package com.matcher;
 
-import java.util.Scanner;
+import java.util.ArrayList;
 
 public class FiniteAutomaton implements Matcher {
+  private String pattern;
+  private char[] alphabet;
   private int[][] transition;
   
+  FiniteAutomaton(String pattern, String alphabet) {
+    this.pattern = pattern;
+    this.alphabet = alphabet.toCharArray();
+    generateTransitionArray();
+  }
+  
   @Override
-  public int findMatch(String text, String pattern) {
-    int index = -1;
-    Scanner scanner = new Scanner(System.in);
-    System.out.print("Enter the alphabet: ");
-    char[] sigma = scanner.next().toCharArray();
-    transition(pattern, sigma);
+  public ArrayList<Integer> findMatch(String text) {
+    ArrayList<Integer> offset = new ArrayList<>();
     int m = pattern.length();
     int q = 0;
     for (int i = 0; i < text.length(); i++) {
-      q = transition[q][alphabetIndex(text.charAt(i), sigma)];
+      q = transition[q][alphabetIndex(text.charAt(i))];
       if (q == m) {
-        index = i - m + 1;
+        offset.add(i - m + 1);
       }
     }
-    return index;
+    return offset;
   }
   
-  private void transition(String pattern, char[] alphabet) {
+  private void generateTransitionArray() {
     int m = pattern.length();
     transition = new int[m + 1][alphabet.length];
-    for (int q = 0; q < m + 1; q++) {
-      for (int i = 0; i < alphabet.length; i++) {
-        int k = Math.min(m, q + 1);
-        while (k > 0 && !(pattern.substring(0, Math.min(q + 1, m))).startsWith(pattern.substring(q - k + 1, q) + alphabet[i])) {
+    for (int i = 0; i < m + 1; i++) {
+      for (int j = 0; j < alphabet.length; j++) {
+        int k = Math.min(m, i + 1);
+        while (k > 0 && !(pattern.substring(0, Math.min(i + 1, m))).startsWith(pattern.substring(i - k + 1, i) + alphabet[j])) {
           k--;
         }
-        transition[q][i] = k;
+        transition[i][j] = k;
       }
     }
   }
   
-  
-  private int alphabetIndex(char a, char[] alphabet) {
+  private int alphabetIndex(char a) {
     int i = 0;
     while (alphabet[i] != a) {
       i++;
@@ -48,21 +51,9 @@ public class FiniteAutomaton implements Matcher {
     return i;
   }
   
-  
-  
-  private void printTransitionTable(char[] sigma) {
-    System.out.print("x ");
-    for (int i = 0; i < sigma.length; i++) {
-      System.out.print(sigma[i] + " ");
-    }
-    System.out.println();
-    for (int i = 0; i < transition.length; i++) {
-      System.out.print(i + " ");
-      for (int j = 0; j < transition[i].length; j++) {
-        System.out.print(transition[i][j] + " ");
-      }
-      System.out.println();
-    }
+  @Override
+  public void setPattern(String pattern) {
+    this.pattern = pattern;
+    generateTransitionArray();
   }
-  
 }

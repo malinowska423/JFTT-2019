@@ -1,5 +1,9 @@
 package com.matcher;
 
+import java.util.ArrayList;
+
 public interface Matcher {
-  int findMatch(String text, String pattern);
+  ArrayList<Integer> findMatch(String text);
+  
+  void setPattern(String pattern);
 }

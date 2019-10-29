@@ -1,7 +1,5 @@
 package com.matcher;
 
-import java.util.Scanner;
-
 public class Main {
 
     public static void main(String[] args) {
@@ -13,28 +11,20 @@ public class Main {
                 "\n\tfor Knuth-Morris-Pratt algorithm." );
             
         } else {
-            Scanner scanner = new Scanner(System.in);
             Matcher matcher;
             if (args[0].equals("-fa")) {
-                matcher = new FiniteAutomaton();
+                matcher = new FiniteAutomaton("αβαβ", "αβγδ");
             } else {
-                matcher = new KMP();
+                matcher = new KMP("αβαβ");
             }
-            System.out.println("You searching with " + matcher.getClass().getSimpleName());
-            System.out.print("Enter the pattern: ");
-            String pattern = scanner.nextLine();
-            System.out.println("Enter the line of text to search: ");
-            String input = scanner.nextLine();
-            while (!input.equals("-q") && !input.equals("-Q")) {
-                System.out.println("Pattern occurs with offset "
-                    + matcher.findMatch(input, pattern));
-                System.out.println("#############");
-                System.out.print("Enter the pattern: ");
-                pattern = scanner.nextLine();
-                System.out.println("Enter the line of text to search: ");
-                input = scanner.nextLine();
-            }
-            scanner.close();
+            System.out.println("You're searching with " + matcher.getClass().getSimpleName());
+            System.out.println("1) ");
+            matcher.findMatch("αβαβγβαβαβαβαβγ")
+                .forEach(integer -> System.out.print(integer + " "));
+            System.out.println("\n2) ");
+            matcher.setPattern("αβ");
+            matcher.findMatch("αβαβγβαβαβαβαβγ")
+                .forEach(integer -> System.out.print(integer + " "));
         }
     }
 }
