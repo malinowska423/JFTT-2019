@@ -3,20 +3,20 @@
 
 int yylex();
 int yywrap();
-int lines = 0;
-int words = 0;
+int linesCount = 0;
+int wordCount = 0;
 %}
 
 %%
-^[ \t]*\n*  ;
-[ \t]+$     ;
-[ \t]+ {printf(" "); words++;}
-\n  {printf("\n"); lines++; words++;}
+^[[:blank:]]*\n*  ;
+[[:blank:]]+$     ;
+[ \t]+ {printf(" ");}
+[a-zA-Z]+   {ECHO; wordCount++;}
+\n  {printf("\n"); linesCount++;}
 %%
 
 int yywrap() {
-    printf("\n#lines: %d\n", lines);
-    printf("#words: %d\n", words);
+    printf("\nlinesCount: %d\nwordCount: %d", linesCount, wordCount);
     return 1;
 }
 

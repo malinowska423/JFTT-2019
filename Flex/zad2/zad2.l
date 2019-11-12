@@ -5,22 +5,27 @@ int yylex();
 int yywrap();
 %}
 
-%x COMMENT
 %x TAG
+%x ATTR
 
 %%
+
+
+\<!--([^-]*|(-[^-]))*--\>  ;
+
 \<                  {ECHO; BEGIN(TAG);}
-                    <TAG>{
-\'([::blank::].*)\'		ECHO;
-.               ECHO;
-\n              ECHO;
-.>             {ECHO; BEGIN(INITIAL);}
+
+<TAG>{
+    =\"|=\'         {ECHO;BEGIN(ATTR);}
+    .               ECHO;
+    \n              ECHO;
+    .>             {ECHO; BEGIN(INITIAL);}
 }
 
-\<!--               BEGIN(COMMENT);
-<COMMENT>{
-.|\n            ;
---\>            BEGIN(INITIAL);
+<ATTR>{
+    .   ECHO;
+    \n  ECHO;
+    .\"|.\'   {ECHO; BEGIN(TAG);}
 }
 
 %%

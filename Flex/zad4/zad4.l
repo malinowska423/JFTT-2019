@@ -18,7 +18,7 @@ void push(int num) {
     if (ptr < STACK_SIZE) {
         stack[ptr] = num;
     } else {
-        fprintf(stderr, "\x1b[31mError: stack overflow - the best forum for programmers in the universe\n\x1b[0m");
+        printf("Error: too much elements\n");
         err = true;
     }
 }
@@ -29,8 +29,8 @@ int pop()  {
         ptr--;
         return stack[ptr + 1];
     } else {
-
         err = true;
+        printf("Error: too few arguments\n");
         return 0;
     }
 }
@@ -43,81 +43,85 @@ int pop()  {
 -?[0-9]+                    push(atoi(yytext));
 
 \+                          {
-a = pop();
-b = pop();
-push(a + b);
+                            a = pop();
+                            b = pop();
+                            if(err) {
+                                BEGIN(ERROR);}
+                            push(a + b);
 }
 
 \-                          {
-a = pop();
-b = pop();
-push(b - a);
+                            a = pop();
+                            b = pop();
+                            if(err) {BEGIN(ERROR);}
+                            push(b - a);
 }
 
 \*                          {
-a = pop();
-b = pop();
-push(a * b);
+                            a = pop();
+                            b = pop();
+                            if(err) {BEGIN(ERROR);}
+                            push(a * b);
 }
 
 \/                          {
-a = pop();
-if (a == 0) {
-fprintf(stderr, "\x1b[31mError: division by 0 is not permitted\n\x1b[0m");
-BEGIN(ERROR);
-} else {
-b = pop();
-push(b / a);
-}
+                            a = pop();
+                            if (a == 0) {
+                                printf("Error: division by 0 is not permitted\n");
+                                BEGIN(ERROR);
+                            } else {
+                                b = pop();
+                                if(err) {BEGIN(ERROR);}
+                                push(b / a);
+                            }
 }
 
 \%                          {
-a = pop();
-if (a == 0) {
-fprintf(stderr, "\x1b[31mError: division by 0 is not permitted\n\x1b[0m");
-BEGIN(ERROR);
-} else {
-b = pop();
-push(b % a);
-}
+                            a = pop();
+                            if (a == 0) {
+                                printf("Error: division by 0 is not permitted\n");
+                                BEGIN(ERROR);
+                            } else {
+                                b = pop();
+                                push(b % a);
+                            }
 }
 \^                          {
-a = pop();
-b = pop();
-push( (int) pow((double) b, (double) a));
+                            a = pop();
+                            b = pop();
+                            push( (int) pow((double) b, (double) a));
 }
 
 [ \t]                       ;
 
 [\n]                        {
-if(ptr != 0) {
-fprintf(stderr, "\x1b[31mError: to few operators\n\x1b[0m");
-ptr = -1;
-err = false;
-BEGIN(INITIAL);
-} else {
-int res = pop();
-if(!err) {
-printf("= %d\n", res);
-} else {
-
-fprintf(stderr, "\x1b[31mError: to few arguments\n\x1b[0m");
-}
-err = false;
-ptr = -1;
-BEGIN(INITIAL);
-}
+                            if(ptr != 0) {
+                                printf("Error: too few operators\n");
+                                ptr = -1;
+                                err = false;
+                                BEGIN(INITIAL);
+                            } else {
+                                int result = pop();
+                                if(!err) {
+                                    printf("= %d\n", result);
+                                } else {
+                                    printf("Error: too few arguments\n");
+                                }
+                                err = false;
+                                ptr = -1;
+                                BEGIN(INITIAL);
+                            }
 }
 
 .                           {
-fprintf(stderr, "\x1b[31mError: unknown character: \"%s\"\n\x1b[0m", yytext);
-ptr = -1;
-BEGIN(ERROR);
+                            printf("Error: unknown character: \"%s\"\n", yytext);
+                            ptr = -1;
+                            BEGIN(ERROR);
 }
 
 <ERROR>{
-.                       ;
-\n                      {ptr = -1; BEGIN(INITIAL);}
+    .                       ;
+    \n                      {err = false; ptr = -1; BEGIN(INITIAL);}
 }
 
 %%

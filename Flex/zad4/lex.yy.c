@@ -386,7 +386,7 @@ void push(int num) {
     if (ptr < STACK_SIZE) {
         stack[ptr] = num;
     } else {
-        fprintf(stderr, "\x1b[31mError: stack overflow - the best forum for programmers in the universe\n\x1b[0m");
+        printf("Error: too much elements\n");
         err = true;
     }
 }
@@ -397,8 +397,8 @@ int pop()  {
         ptr--;
         return stack[ptr + 1];
     } else {
-
         err = true;
+        printf("Error: too few arguments\n");
         return 0;
     }
 }
@@ -652,48 +652,53 @@ YY_RULE_SETUP
 {
 a = pop();
 b = pop();
+if(err) {
+    BEGIN(ERROR);}
 push(a + b);
 }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 51 "zad4.l"
+#line 53 "zad4.l"
 {
 a = pop();
 b = pop();
+if(err) {BEGIN(ERROR);}
 push(b - a);
 }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 57 "zad4.l"
+#line 60 "zad4.l"
 {
 a = pop();
 b = pop();
+if(err) {BEGIN(ERROR);}
 push(a * b);
 }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 63 "zad4.l"
+#line 67 "zad4.l"
 {
 a = pop();
 if (a == 0) {
-fprintf(stderr, "\x1b[31mError: division by 0 is not permitted\n\x1b[0m");
+printf("Error: division by 0 is not permitted\n");
 BEGIN(ERROR);
 } else {
 b = pop();
+if(err) {BEGIN(ERROR);}
 push(b / a);
 }
 }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 74 "zad4.l"
+#line 79 "zad4.l"
 {
 a = pop();
 if (a == 0) {
-fprintf(stderr, "\x1b[31mError: division by 0 is not permitted\n\x1b[0m");
+printf("Error: division by 0 is not permitted\n");
 BEGIN(ERROR);
 } else {
 b = pop();
@@ -703,7 +708,7 @@ push(b % a);
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 84 "zad4.l"
+#line 89 "zad4.l"
 {
 a = pop();
 b = pop();
@@ -712,59 +717,58 @@ push( (int) pow((double) b, (double) a));
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 90 "zad4.l"
+#line 95 "zad4.l"
 ;
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 92 "zad4.l"
+#line 97 "zad4.l"
 {
-if(ptr != 0) {
-fprintf(stderr, "\x1b[31mError: to few operators\n\x1b[0m");
-ptr = -1;
-err = false;
-BEGIN(INITIAL);
-} else {
-int res = pop();
-if(!err) {
-printf("= %d\n", res);
-} else {
-
-fprintf(stderr, "\x1b[31mError: to few arguments\n\x1b[0m");
-}
-err = false;
-ptr = -1;
-BEGIN(INITIAL);
-}
+                            if(ptr != 0) {
+                                printf("Error: too few operators\n");
+                                ptr = -1;
+                                err = false;
+                                BEGIN(INITIAL);
+                            } else {
+                                int result = pop();
+                                if(!err) {
+                                    printf("= %d\n", result);
+                                } else {
+                                    printf("Error: too few arguments\n");
+                                }
+                                err = false;
+                                ptr = -1;
+                                BEGIN(INITIAL);
+                            }
 }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 112 "zad4.l"
+#line 116 "zad4.l"
 {
-fprintf(stderr, "\x1b[31mError: unknown character: \"%s\"\n\x1b[0m", yytext);
-ptr = -1;
-BEGIN(ERROR);
+                            printf("Error: unknown character: \"%s\"\n", yytext);
+                            ptr = -1;
+                            BEGIN(ERROR);
 }
 	YY_BREAK
 
 case 11:
 YY_RULE_SETUP
-#line 119 "zad4.l"
+#line 123 "zad4.l"
 ;
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 120 "zad4.l"
-{ptr = -1; BEGIN(INITIAL);}
+#line 124 "zad4.l"
+{err = false; ptr = -1; BEGIN(INITIAL);}
 	YY_BREAK
 
 case 13:
 YY_RULE_SETUP
-#line 123 "zad4.l"
+#line 127 "zad4.l"
 ECHO;
 	YY_BREAK
-#line 768 "lex.yy.c"
+#line 772 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(ERROR):
 	yyterminate();
@@ -1651,7 +1655,7 @@ int main()
 	return 0;
 	}
 #endif
-#line 123 "zad4.l"
+#line 127 "zad4.l"
 
 
 int yywrap() {
