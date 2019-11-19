@@ -5,61 +5,41 @@
 int yywrap();
 int yylex();
 
-bool print_doc = false;
+bool print_doc = true;
 %}
 
-%x SINGLE_LINE_COMMENT
 %x MULTI_LINE_COMMENT
-%x SINGLE_LINE_DOC_COMMENT
-%x MULTI_LINE_DOC_COMMENT
-%x STRING_COMMENT
-%x INCLUDE_COMMENT
+%x COMMENT_IN_STRING
+
+
+open_multiline \/\*(\n)?
+open_multiline_doc \/\*(\*|!)(\n)?
+close_multiline \*\/(\n)?
+single_line \/\/.*(\n)
+single_line_doc \/\/(\/|!).*(\n)
 
 %%
-\"                              {ECHO;BEGIN(STRING_COMMENT);  }
-\<  {ECHO; BEGIN(INCLUDE_COMMENT);}
-
-<STRING_COMMENT>{
+#include.* ECHO;
+\" {ECHO;BEGIN(COMMENT_IN_STRING);}
+\/(\\\n)*\/(.|\\\n)* ;
+<COMMENT_IN_STRING>{
+\/\/    ECHO;
+\"  {ECHO; BEGIN(INITIAL);}
 .   ECHO;
-\n  ECHO;
-.\"                          {ECHO; BEGIN(INITIAL);}
-}
-
-<INCLUDE_COMMENT>{
-.   ECHO;
-\n  ECHO;
-.\>                          {ECHO; BEGIN(INITIAL);}
 }
 
 
-\/(\\|\n)*\/                 {BEGIN(SINGLE_LINE_COMMENT);}
-
-<SINGLE_LINE_COMMENT>{
-.*\\\n                      ;
-.                           ;
-[^\\]\n                        {printf("\n"); BEGIN(INITIAL);}
-}
-
-\/(\\|\n)*\*                 BEGIN(MULTI_LINE_COMMENT);
-
+{open_multiline} BEGIN(MULTI_LINE_COMMENT);
 <MULTI_LINE_COMMENT>{
-.|\n                        ;
-\*(\\|\n)*\/             BEGIN(INITIAL);
+.|\n    ;
+{close_multiline}   { BEGIN(INITIAL); }
 }
 
-\/(\\|\n)*\/(\\|\n)*\/    {BEGIN(SINGLE_LINE_DOC_COMMENT); if(print_doc) ECHO;}
-<SINGLE_LINE_DOC_COMMENT>{
-.                           {if(print_doc) ECHO;}
-.*\\\n                      {if(print_doc) ECHO;}
-.?\n                     {if(print_doc) printf("\n"); BEGIN(INITIAL);}
-}
+{open_multiline_doc} {if(print_doc) ECHO; else BEGIN(MULTI_LINE_COMMENT);}
 
-\/(\\|\n)*\*(\\|\n)*\*    {BEGIN(MULTI_LINE_DOC_COMMENT); if(print_doc) ECHO;}
-<MULTI_LINE_DOC_COMMENT>{
-.|\n                        {if(print_doc) ECHO;}
-\*(\\|\n)*\/             {printf("\n"); if(print_doc) ECHO; BEGIN(INITIAL);}
-}
+{single_line_doc} {if(print_doc) ECHO; }
 
+{single_line} ;
 %%
 
 int yywrap() {
