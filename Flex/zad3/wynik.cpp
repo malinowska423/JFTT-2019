@@ -1,6 +1,6 @@
 #include "test/*asdf*/header.h"
 #include <stdio.h>
-#include <foobaz.h>
+#include <foo/*bar*/baz.h>
 
 
 
