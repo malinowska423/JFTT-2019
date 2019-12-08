@@ -21,3 +21,25 @@ $>gcc lex.yy.c -o zad
 $>zad < test.txt > wynik.txt
 ```
 
+## Lista 3
+### Bison
+Translator wyrażeń arytmetycznych na liczbach całkowitych z postaci infiksowej do postaci postfiksowej podający wynik obliczenia tłumaczonego wyrażenia. Program przetwarza wejście liniami. Można podzielić linię znakiem `\` (tak jak w języku C). Aby wprowadzić komentarz należy na początku linii umieścić `#`.
+
+Kompilacja programu (na Windowsie):
+```
+$>mingw32-make
+```
+
+Uruchomienie interaktywne:
+```
+$>calc
+```
+Uruchomienie dla przykładów z pliku:
+```
+$>calc < test.txt
+```
+
+Czyszczenie plików wynikowych:
+```
+$>mingw-make clean
+```
