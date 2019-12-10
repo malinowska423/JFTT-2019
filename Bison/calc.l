@@ -25,7 +25,7 @@
 \/                              return DIV;
 \%                              return MOD;
 \^                              return PWR;
-\(                              return LBRACKET;
-\)                              return RBRACKET;
+\(                              return LEFTBRAC;
+\)                              return RIGHTBRAC;
 .                               ;
 %%

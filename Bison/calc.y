@@ -3,14 +3,10 @@
 #include <sstream>
 #include <cmath>
 
-#include "calc.hpp"
-
 extern int yylineno;
 
-bool err = false;
 std::ostringstream oss;
 const std::string default_err = "blad skladni";
-std::string err_msg = default_err;
 
 int yylex();
 void yyerror(const char *s);
@@ -18,8 +14,8 @@ void yyerror(const char *s);
 
 %token NUM
 %token NEWLINE
-%token LBRACKET
-%token RBRACKET
+%token LEFTBRAC
+%token RIGHTBRAC
 %left PLUS MINUS
 %left MULT MOD DIV
 %right PWR
@@ -34,63 +30,63 @@ input:
 line:
     NEWLINE
     | expr NEWLINE   {
-                        if(!err) {
                             oss << "\nWynik: " << $1 << std::endl;
                             std::string s = oss.str();
                             oss.str("");
                             oss.clear();
                             std::cout << s << std::endl;
-                        } else {
-                            oss.str("");
-                            oss.clear();
-                            std::cout << std::endl;
-                            err = false;
-                        }
                     }
     | error NEWLINE
 ;
 
 expr:
     NUM                         { $$ = $1; oss << $1 << " ";}
-    | expr PLUS expr            { $$ = add($1, $3); oss << "+ "; }
-    | expr MINUS expr           { $$ = sub($1, $3); oss << "- "; }
-    | expr MULT expr            { $$ = mult($1, $3); oss << "* "; }
+    | expr PLUS expr            { $$ = $1 + $3; oss << "+ "; }
+    | expr MINUS expr           { $$ = $1 - $3; oss << "- "; }
+    | expr MULT expr            { $$ = $1 * $3; oss << "* "; }
     | expr DIV expr             {
                                     oss << "/ ";
                                     if($3 == 0) {
-                                        err_msg = "dzielenie przez 0 jest niedozwolone";
-                                        yyerror("");
+                                        yyerror("dzielenie przez 0 jest niedozwolone");
                                     } else {
-                                        $$ = divide($1, $3);
+                                        $$ = floor((double) $1 / (double) $3);
                                     }
                                 }
     | expr MOD expr             {
                                     oss << "% ";
                                     if($3 == 0) {
-                                        err_msg = "dzielenie przez 0 jest niedozwolone";
-                                        yyerror("");
+                                        yyerror("dzielenie przez 0 jest niedozwolone");
                                     } else {
-                                        $$ = modulo($1, $3);
+                                        int mod = $1 % $3;
+                                        if(mod * $3 < 0) {
+                                            mod = $3 + mod;
+                                        }
+                                        $$ = mod;
                                     }
                                 }
     | MINUS expr %prec NEG      { $$ = -$2; oss << "~ "; }
     | expr PWR expr             {
                                     oss << "^ ";
                                     if($3 < 0) {
-                                        err_msg = "potega musi byc dodatnia";
-                                        yyerror("");
+                                        yyerror("potega musi byc dodatnia");
                                     } else {
-                                        $$ = pwr($1, $3);
+                                        $$ = pow($1, $3);
                                     }
                                 }
-    | LBRACKET expr RBRACKET   { $$ = $2; }
+    | LEFTBRAC expr RIGHTBRAC   { $$ = $2; }
 ;
 %%
 
 void yyerror(const char *s) {
-    err = true;
+    std::string err_msg;
+    if(s == "" || s == "syntax error") {
+        err_msg = default_err;
+    } else {
+        err_msg = s;
+    }
     std::cerr << "Blad: " << err_msg << std::endl;
-    err_msg = default_err;
+    oss.str("");
+    oss.clear();
     return;
 }
 
